@@ -1,0 +1,243 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const greetingBox = document.querySelector('.greeting-box');
+    const body = document.body;
+    const loveMessage = document.querySelector('.love-message');
+    const heartContainer = document.querySelector('.heart-container');
+    const yesButton = document.getElementById('yesButton');
+    const noButton = document.getElementById('noButton');
+    const proposalButtons = document.querySelector('.proposal-buttons');
+    const proposalMessage = document.querySelector('.proposal-message');
+    const celebration = document.getElementById('celebration');
+    const container = document.querySelector('.container');
+
+    // Add decorative elements
+    addDecorativeElements();
+    
+    // Entry animation
+    greetingBox.style.transform = 'scale(0.9)';
+    greetingBox.style.opacity = '0';
+    
+    setTimeout(() => {
+        greetingBox.style.transform = 'scale(1)';
+        greetingBox.style.opacity = '1';
+    }, 300);
+
+    // Reveal love message with delay
+    setTimeout(() => {
+        loveMessage.style.opacity = '1';
+        loveMessage.style.transform = 'scale(1)';
+    }, 1500);
+
+    // Create floating hearts
+    function createHearts() {
+        for (let i = 0; i < 12; i++) {
+            setTimeout(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 2 + 's';
+                heart.style.animationDuration = Math.random() * 3 + 3 + 's';
+                heart.style.opacity = '0.8';
+                
+                // Randomly add different colors
+                const colors = ['#9c27b0', '#7b1fa2', '#6a1b9a'];
+                heart.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Randomly vary heart sizes
+                const size = 15 + Math.random() * 15;
+                heart.style.width = size + 'px';
+                heart.style.height = size + 'px';
+                
+                heartContainer.appendChild(heart);
+
+                // Update pseudo-elements to match
+                const style = document.createElement('style');
+                style.innerHTML = `
+                .heart:nth-child(${heartContainer.children.length}):before,
+                .heart:nth-child(${heartContainer.children.length}):after {
+                    width: ${size}px;
+                    height: ${size}px;
+                    background-color: ${heart.style.backgroundColor};
+                }
+                .heart:nth-child(${heartContainer.children.length}):before {
+                    top: -${size/2}px;
+                }
+                .heart:nth-child(${heartContainer.children.length}):after {
+                    left: -${size/2}px;
+                }`;
+                document.head.appendChild(style);
+
+                // Remove heart after animation completes
+                setTimeout(() => {
+                    heart.remove();
+                    style.remove();
+                }, 6000);
+            }, i * 300);
+        }
+    }
+
+    createHearts();
+    // Create new hearts periodically
+    setInterval(createHearts, 8000);
+
+    // Add a little animation for the greeting box on load
+    setTimeout(() => {
+        greetingBox.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            greetingBox.style.transform = 'scale(1)';
+        }, 200);
+    }, 800);
+
+    // Handle proposal response
+    yesButton.addEventListener('click', () => {
+        // Hide proposal elements
+        proposalButtons.style.display = 'none';
+        proposalMessage.style.display = 'none';
+
+        // Create response message with animated heart
+        const responseMessage = document.createElement('div');
+        responseMessage.classList.add('response-message');
+        responseMessage.innerHTML = 'Que bom! Nika, agora somos namorados! <span class="heart-icon">❤️</span>';
+        greetingBox.insertBefore(responseMessage, heartContainer);
+
+        // Change background animation
+        body.style.animation = 'gradientBG 8s ease infinite';
+        body.style.backgroundSize = '400% 400%';
+        body.style.background = 'linear-gradient(135deg, #f3e5f5, #e1bee7, #ce93d8, #ba68c8, #ab47bc)';
+
+        // Show response with animation
+        setTimeout(() => {
+            responseMessage.style.display = 'block';
+            setTimeout(() => {
+                responseMessage.style.opacity = '1';
+                responseMessage.style.transform = 'scale(1)';
+                
+                // Add a subtle shine to the greeting box
+                greetingBox.style.boxShadow = '0 10px 30px rgba(156, 39, 176, 0.5), 0 0 20px rgba(156, 39, 176, 0.3), 0 0 40px rgba(156, 39, 176, 0.2)';
+            }, 100);
+        }, 300);
+
+        // Create celebration effect
+        celebration.style.display = 'block';
+        createConfetti();
+
+        // Create extra hearts
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => createHearts(), i * 500);
+        }
+    });
+
+    // Make the No button run away from the cursor
+    noButton.addEventListener('mouseover', (e) => {
+        // Calculate a safe position within viewport bounds
+        const buttonWidth = noButton.offsetWidth;
+        const buttonHeight = noButton.offsetHeight;
+        const maxX = window.innerWidth - buttonWidth - 20;
+        const maxY = window.innerHeight - buttonHeight - 20;
+        
+        const x = Math.max(20, Math.min(maxX, Math.random() * maxX));
+        const y = Math.max(20, Math.min(maxY, Math.random() * maxY));
+
+        noButton.style.position = 'fixed';
+        noButton.style.left = `${x}px`;
+        noButton.style.top = `${y}px`;
+        
+        // Also make the button smaller each time
+        const currentScale = noButton.style.transform ? 
+            parseFloat(noButton.style.transform.replace('scale(', '').replace(')', '')) : 1;
+        const newScale = Math.max(0.5, currentScale - 0.05);
+        noButton.style.transform = `scale(${newScale})`;
+    });
+
+    // Create confetti for celebration
+    function createConfetti() {
+        const colors = ['#9c27b0', '#7b1fa2', '#6a1b9a', '#4a148c', '#e1bee7', '#d1c4e9', '#aa00ff', '#d500f9'];
+
+        for (let i = 0; i < 150; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Vary confetti shapes - sometimes hearts, sometimes rectangles
+                if (Math.random() > 0.7) {
+                    confetti.style.clipPath = 'path("M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z")';
+                }
+                
+                // Add some rotation to the animation
+                const duration = Math.random() * 3 + 2;
+                const rotation = Math.random() * 360;
+                confetti.style.animation = `confettiFall ${duration}s ease forwards`;
+                
+                // Add unique animations for each confetti for more natural movement
+                const style = document.createElement('style');
+                style.innerHTML = `
+                @keyframes confetti-fall-${i} {
+                    0% { transform: translateY(-100px) rotate(${rotation}deg); opacity: 1; }
+                    50% { transform: translateY(${50 + Math.random() * 30}vh) rotate(${rotation + 180}deg); opacity: 0.8; }
+                    100% { transform: translateY(100vh) rotate(${rotation + 360}deg); opacity: 0; }
+                }`;
+                document.head.appendChild(style);
+                
+                confetti.style.animation = `confetti-fall-${i} ${duration}s ease forwards`;
+                celebration.appendChild(confetti);
+
+                // Remove confetti after animation
+                setTimeout(() => {
+                    confetti.remove();
+                    style.remove();
+                }, duration * 1000);
+            }, i * 20);
+        }
+    }
+    
+    // Add decorative elements around the page
+    function addDecorativeElements() {
+        const decorCount = 8;
+        
+        for (let i = 0; i < decorCount; i++) {
+            const decor = document.createElement('div');
+            decor.classList.add('floating-decor');
+            
+            // Create an SVG element
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute("width", "40");
+            svg.setAttribute("height", "40");
+            svg.setAttribute("viewBox", "0 0 24 24");
+            
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            
+            // Alternate between hearts and stars
+            if (i % 2 === 0) {
+                path.setAttribute("d", "M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z");
+                path.setAttribute("fill", "#9c27b0");
+            } else {
+                path.setAttribute("d", "M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z");
+                path.setAttribute("fill", "#7b1fa2");
+            }
+            
+            svg.appendChild(path);
+            decor.appendChild(svg);
+            
+            // Position randomly around the container
+            const size = 30 + Math.random() * 30;
+            decor.style.width = `${size}px`;
+            decor.style.height = `${size}px`;
+            
+            const angle = (i / decorCount) * 2 * Math.PI;
+            const distance = 250 + Math.random() * 150;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+            
+            decor.style.top = `calc(50% + ${y}px)`;
+            decor.style.left = `calc(50% + ${x}px)`;
+            
+            // Add floating animation
+            decor.style.animation = `float ${5 + Math.random() * 5}s ease-in-out infinite`;
+            decor.style.animationDelay = `${Math.random() * 5}s`;
+            
+            document.body.appendChild(decor);
+        }
+    }
+});
